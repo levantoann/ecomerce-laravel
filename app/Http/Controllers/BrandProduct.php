@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CategoryPostModel;
+use App\Models\Product;
+use App\Models\Silder;
+use Auth;
 use DB;
 use App\Models\Brand;
 use Session;
@@ -12,7 +16,7 @@ session_start();
 class BrandProduct extends Controller
 {
    public function AuthLogin() {
-      $admin_id = Session::get("admin_id");
+      $admin_id = Auth::id();
       if ($admin_id) {
           return Redirect::to("dashboard");
       } else { 
@@ -53,14 +57,14 @@ class BrandProduct extends Controller
     
        public function unactive_brand_product($brand_product_id) { 
          $this->AuthLogin();
-          DB::table('tbl_brand')->where('brand_id',$brand_product_id)->update(['brand_status'=>1]);
+          DB::table('tbl_brand')->where('brand_id',$brand_product_id)->update(['brand_status'=>0]);
           Session::put('message','Không kích hoạt thương hiệu sản phẩm');
           return Redirect::to('all-brand-product');
        }
     
        public function active_brand_product($brand_product_id) { 
          $this->AuthLogin();
-          DB::table('tbl_brand')->where('brand_id',$brand_product_id)->update(['brand_status'=>0]);
+          DB::table('tbl_brand')->where('brand_id',$brand_product_id)->update(['brand_status'=>1]);
           Session::put('message','Kích hoạt thương hiệu sản phẩm');
           return Redirect::to('all-brand-product');
        }
@@ -95,6 +99,8 @@ class BrandProduct extends Controller
        }
 
        public function show_brand_home(Request $request,$slug_brand_product) { 
+         $category_post = CategoryPostModel::orderBy('cate_post_id','DESC')->get();
+        $slider = Silder::orderBy('slider_id','DESC')->where('slider_status','1')->take(4)->get();
         $cate_product = DB::table("tbl_category_product")->where('category_status','1')->orderBy("category_id","desc")
         ->get();
         $brand_product = DB::table("tbl_brand")->where('brand_status','1')->orderBy("brand_id","desc")->get();
@@ -103,6 +109,11 @@ class BrandProduct extends Controller
          ->where("tbl_brand.slug_brand_product",$slug_brand_product)->get();
 
          $brand_name = DB::table('tbl_brand')->where('tbl_brand.slug_brand_product',$slug_brand_product)->limit(1)->get();
+
+         $min_price = Product::min('product_price');
+        $max_price = Product::max('product_price');
+        
+        $max_price_range = $max_price ;
        
 
           $meta_keywords = "cc";
@@ -113,6 +124,9 @@ class BrandProduct extends Controller
          }
          return view('pages.brand.show_brand')->with('cate_product',$cate_product)->with('brand_product',$brand_product)
          ->with('brand_by_id',$brand_by_id)->with('brand_name',$brand_name)->with('meta_desc',$meta_desc)
-         ->with('meta_keywords',$meta_keywords)->with('meta_title',$meta_title)->with('url_canonical',$url_canonical);
+         ->with('meta_keywords',$meta_keywords)->with('category_post',$category_post)
+         ->with('meta_title',$meta_title)->with('url_canonical',$url_canonical)->with('slider',$slider)
+         ->with('max_price',$max_price)->with('min_price',$min_price)->with('max_price_range',$max_price_range);
+         
       }
 }

@@ -28,6 +28,17 @@
                                     <input type="text" name="slug_product" class="form-control" id="slug" placeholder="Tên sản phẩm">
                                 </div>
 
+
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">Số lượng sản phẩm</label>
+                                    <input type="text" name="product_quantity" class="form-control" placeholder="Tên sản phẩm">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">Số lượng đã bán</label>
+                                    <input type="text" name="product_sold" class="form-control" placeholder="Tên sản phẩm">
+                                </div>
+
                                     <div class="form-group">
                                         <label for="exampleInputEmail2">Giá sản phẩm</label>
                                         <input type="text" name="product_price" class="form-control" id="exampleInputEmail2" placeholder="Giá sản phẩm">
@@ -57,6 +68,13 @@
                                         @endforeach
                                     </select>
                                 </div>
+
+                                
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">Tags sản phẩm</label>
+                                    <input type="text" data-role="tagsinput" name="product_tags" class="form-control">
+                                </div>
+
                                 <div class="form-group">
                                 <label for="exampleInputPassword1">Thương hiệu sản phẩm</label>
                                     <select name="product_brand" class="form-control input-sm m-bot15">

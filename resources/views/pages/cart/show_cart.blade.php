@@ -28,14 +28,15 @@
                         @foreach ($content as $v_content)
 						<tr>
 							<td class="cart_product">
-								<a href=""><img src="{{URL::to('public/uploads/product/'.$v_content->options->image)}}" style="width:100px;height:100px" alt=""></a>
+								<a href=""><img src="{{URL::to('uploads/product/'.$v_content->options->image)}}" style="width:100px;height:100px" alt=""></a>
 							</td>
 							<td class="cart_description">
 								<h4><a href="">{{$v_content->name}}</a></h4>
 								<p>Web ID: 1089772</p>
 							</td>
 							<td class="cart_price">
-								<p>{{number_format($v_content->price).' VND'}}</p>
+								<p>{{number_format($v_content->price,0,',','.').' VNĐ'}}
+								</p>
 							</td>
 							<td class="cart_quantity">
 								<div class="cart_quantity_button">

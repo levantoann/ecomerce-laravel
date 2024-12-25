@@ -27,6 +27,10 @@
                                     <label for="exampleInputEmail1">Slug sản phẩm</label>
                                     <input type="text" name="slug_product" class="form-control" id="slug" placeholder="Tên sản phẩm" value="{{$pro->slug_product}}">
                                 </div>
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">Số lượng sản phẩm</label>
+                                    <input type="text" name="product_quantity" class="form-control" id="exampleInputEmail1" placeholder="Giá sản phẩm" value="{{$pro->product_quantity}}">
+                                </div>
 
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">Giá sản phẩm</label>
@@ -35,15 +39,15 @@
                                 <div class="form-group">
                                     <label for="exampleInputPassword1">Hình ảnh sản phẩm</label>
                                     <input type="file" name="product_image" class="form-control">
-                                    <img src="{{URL::to('public/uploads/product/'.$pro->product_image)}}" alt="" style="width:100px;height:100px">
+                                    <img src="{{URL::to('uploads/product/'.$pro->product_image)}}" alt="" style="width:100px;height:100px">
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputPassword1">Mô tả sản phẩm</label>
-                                    <textarea name="product_desc" style="resize:none" rows="3" type="text" class="form-control" id="exampleInputPassword1">{{$pro->product_desc}}</textarea>
+                                    <textarea name="product_desc" id="ckeditor2" style="resize:none" rows="3" type="text" class="form-control" id="exampleInputPassword1">{{$pro->product_desc}}</textarea>
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputPassword1">Nội dung sản phẩm</label>
-                                    <textarea name="product_content" style="resize:none" rows="3" type="text" class="form-control" id="exampleInputPassword1">{{$pro->product_content}}</textarea>
+                                    <textarea name="product_content" id="ckeditor3" style="resize:none" rows="3" type="text" class="form-control" id="exampleInputPassword1">{{$pro->product_content}}</textarea>
                                 </div>
                                 
                                 <div class="form-group">
@@ -57,6 +61,10 @@
                                         @endif
                                         @endforeach
                                     </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">Tags sản phẩm</label>
+                                    <input type="text" name="product_tags" class="form-control" data-role="tagsinput" value="{{$pro->product_tags}}">
                                 </div>
                                 <div class="form-group">
                                 <label for="exampleInputPassword1">Thương hiệu sản phẩm</label>

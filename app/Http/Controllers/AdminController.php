@@ -2,6 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
+use App\Models\Order;
+use App\Models\Post;
+use App\Models\Product;
+use App\Models\Statistic;
+use App\Models\Video;
+use App\Models\Visitor;
+use Auth;
+use Carbon\Carbon;
 use DB;
 use Session;
 use Illuminate\Http\Request;
@@ -116,7 +125,7 @@ public function callback_google(){
     
     public function AuthLogin() {
        if(Session::get('login_normal')) {
-        $admin_id = Session::get("admin_id");
+        $admin_id = Auth::id();
         if ($admin_id) {
             return Redirect::to("dashboard");
     } else { 
@@ -128,9 +137,51 @@ public function callback_google(){
         return view("admin.admin_login");
     }
     
-    public function show_dashboard() { 
+    public function show_dashboard(Request $request) { 
         $this->AuthLogin();
-        return view("admin.dashboard");
+        $users_ip_address = $request->ip();
+        // Sửa lại việc tính ngày đầu tháng trước
+        $early_last_month = Carbon::now('Asia/Ho_Chi_Minh')->subMonth()->startOfMonth()->toDateString();
+        $end_of_last_month = Carbon::now('Asia/Ho_Chi_Minh')->subMonth()->endOfMonth()->toDateString(); // Sửa lại để lấy cuối tháng trước
+        $early_this_month = Carbon::now('Asia/Ho_Chi_Minh')->startOfMonth()->toDateString(); // Sửa lại để lấy đầu tháng này
+        $oneyears = Carbon::now('Asia/Ho_Chi_Minh')->subYear()->toDateString();
+
+        $now = Carbon::now('Asia/Ho_Chi_Minh')->toDateString();
+        
+        $visitor_of_lastmonth = Visitor::whereBetween('date_visitor',[$early_last_month,$end_of_last_month])->get();
+        $visitor_of_last_month_count = $visitor_of_lastmonth->count();
+        
+        $visitor_of_thismonth = Visitor::whereBetween('date_visitor',[$early_this_month,$now])->get();
+        $visitor_of_this_month_count = $visitor_of_thismonth->count();
+        
+        $visitor_of_year = Visitor::whereBetween('date_visitor',[$oneyears,$now])->get();
+        $visitor_of_year_count = $visitor_of_year->count();
+
+        $visitors = Visitor::all();
+        $visitors_total = $visitors->count();
+
+        $visitor_current = Visitor::where('ip_address', $users_ip_address)->get(); // Sử dụng where thay vì whereBetween
+        $visitor_count = $visitor_current->count();
+
+        if ($visitor_count<1) {
+           $visitor = new Visitor();
+           $visitor->ip_address = $users_ip_address;
+           $visitor->date_visitor = Carbon::now('Asia/Ho_Chi_Minh')->toDateString();
+           $visitor->save();
+        }
+
+       
+
+        // $product = Product::all()->count();
+        // $product_views = Product::orderBy('product_views','DESC')->take(20)->get();
+        // $post = Post::all()->count();
+        // $post_views = Post::orderBy('post_views','DESC')->take(20)->get();
+        $order = Order::all()->count();
+        $video = Video::all()->count();
+        $customer = Customer::all()->count();
+        return view("admin.dashboard")->with(
+            compact('visitors_total','visitor_count','visitor_of_last_month_count','visitor_of_this_month_count','visitor_of_year_count'
+            ,'order','video','customer'));
     }
 
     public function dashboard(Request $request) { 
@@ -153,5 +204,79 @@ public function callback_google(){
         Session::put('admin_name', null);
         Session::put('admin_id',null);
         return redirect('admin');
+        
+    }
+
+   public function filter_by_date(Request $request) {
+    $data = $request->all();
+    $from_date = $data['from_date'];
+    $to_date = $data['to_date'];
+
+    $get = Statistic::whereBetween('order_date',[$from_date,$to_date])->orderBy('order_date','ASC')->get();
+
+    foreach($get as $key => $val) {
+        $chart_data[] = array(
+            'period' => $val->order_date,
+            'order' => $val->total_order,
+            'sales' => $val->sales,
+            'profit' => $val->profit,
+            'quantity' => $val->quantity,
+        );
+    }
+    echo $data = json_encode($chart_data);
+   }
+   
+   public function dashboard_filter(Request $request){
+        $data = $request->all();
+
+        $dauthangnay = Carbon::now('Asia/Ho_Chi_Minh')->startOfMonth()->toDateString();
+        $dau_thangtruoc = Carbon::now('Asia/Ho_Chi_Minh')->subMonth()->startOfMonth()->toDateString();
+        $cuoi_thangtruoc = Carbon::now('Asia/Ho_Chi_Minh')->endOfMonth()->toDateString();
+   
+        $sub7days = Carbon::now('Asia/Ho_Chi_Minh')->subDays(7)->toDateString();
+        $sub365days = Carbon::now('Asia/Ho_Chi_Minh')->subDays(365)->toDateString();
+
+        $now = Carbon::now('Asia/Ho_Chi_Minh')->toDateString();
+
+        if ($data['dashboard_value']=='7ngay') {
+            $get = Statistic::whereBetween('order_date',[$sub7days,$now])->orderBy('order_date','ASC')->get();
+
+        }elseif($data['dashboard_value']=='thangtruoc') {
+            $get = Statistic::whereBetween('order_date',[$dau_thangtruoc,$cuoi_thangtruoc])->orderBy('order_date','ASC')->get();
+        }
+        elseif($data['dashboard_value']=='thannay') {
+            $get = Statistic::whereBetween('order_date',[$dauthangnay,$now])->orderBy('order_date','ASC')->get();
+        }
+        else {
+            $get = Statistic::whereBetween('order_date',[$sub365days,$now])->orderBy('order_date','ASC')->get();
+        }
+        foreach($get as $key => $val) {
+            $chart_data[] = array(
+                'period' => $val->order_date,
+                'order' => $val->total_order,
+                'sales' => $val->sales,
+                'profit' => $val->profit,
+                'quantity' => $val->quantity,
+            );
+        }
+        echo $data = json_encode($chart_data);
+    }
+
+    public function days_order(Request $request) {
+        $sub39days = Carbon::now('Asia/Ho_Chi_Minh')->subDays(30    )->toDateString();
+        $now = Carbon::now('Asia/Ho_Chi_Minh')->toDateString();
+
+        $get = Statistic::whereBetween('order_date',[$sub39days,$now])->orderBy('order_date','ASC')->get();
+
+        foreach($get as $key => $val) {
+            $chart_data[] = array(
+                'period' => $val->order_date,
+                'order' => $val->total_order,
+                'sales' => $val->sales,
+                'profit' => $val->profit,
+                'quantity' => $val->quantity,
+            );
+        }
+        echo $data = json_encode($chart_data);
     }
 }

@@ -5,7 +5,7 @@
     <div class="panel-heading">
       Liệt kê sản phẩm
     </div>
-    <div class="row w3-res-tb">
+    <!-- <div class="row w3-res-tb">
       <div class="col-sm-5 m-b-xs">
         <select class="input-sm form-control w-sm inline v-middle">
           <option value="0">Bulk action</option>
@@ -25,7 +25,7 @@
           </span>
         </div>
       </div>
-    </div>
+    </div> -->
     <div class="table-responsive">
     <?php 
 		$message = Session::get("message");
@@ -34,7 +34,7 @@
 			Session::put("message",  null);
 		}
 	?>
-      <table class="table table-striped b-t b-light">
+      <table class="table table-striped b-t b-light" id="myTable">
         <thead>
           <tr>
             <th style="width:20px;">
@@ -43,11 +43,13 @@
               </label>
             </th>
             <th>Tên sản phẩm</th>
+            <th>Thư viện ảnh</th>
+            <th>Số lượng sản phẩm</th>
+            <th>Slug</th>
             <th>Giá</th>
             <th>Hình ảnh sản phẩm</th>
-            <th>Mô tả sản phẩm</th>
-            <th>Nội dung sản phẩm</th>
             <th>Danh mục</th>
+            <th>Tags sản phẩm</th>
             <th>Thương hiệu</th>
             <th>Hiển Thị</th>
             <th style="width:30px;"></th>
@@ -59,12 +61,13 @@
           <tr>
             <td><label class="i-checks m-b-none"><input type="checkbox" name="post[]"><i></i></label></td>
             <td>{{$pro->product_name}}</td>
+            <td><a href="{{('/add-gallery/'.$pro->product_id)}}">Thêm thư viện ảnh</a></td>
+            <td>{{$pro->product_quantity}}</td>
             <td>{{$pro->slug_product}}</td>
-            <td>{{$pro->product_price}}</td>
-            <td><img src="public/uploads/product/{{$pro->product_image}}" alt="" style="width: 100px;height: 100px;"></td>
-            <td>{{$pro->product_desc}}</td>
-            <td>{{$pro->product_content}}</td>
+            <td>{{number_format($pro->product_price,0,',','.').' VNĐ'}}</td>
+            <td><img src="uploads/product/{{$pro->product_image}}" alt="" style="width: 100px;height: 100px;"></td>
             <td>{{$pro->category_name}}</td>
+            <td>{{$pro->product_tags}}</td>
             <td>{{$pro->brand_name}}</td>
             <td><span class="text-ellipsis">
               <?php 
@@ -94,8 +97,18 @@
       
         </tbody>
       </table>
+
+      <!-- <form action="{{url('import-csv-product')}}" method="POST" enctype="multipart/form-data">
+          @csrf
+        <input type="file" name="file" accept=".xlsx"><br>
+       <input type="submit" value="Import file Excel" name="import_csv" class="btn btn-warning">
+        </form>
+       <form action="{{url('export-csv-product')}}" method="POST">
+          @csrf
+       <input type="submit" value="Export file Excel" name="export_csv" class="btn btn-success">
+      </form> -->
     </div>
-    <footer class="panel-footer">
+    <!-- <footer class="panel-footer">
       <div class="row">
         
         <div class="col-sm-5 text-center">
@@ -112,7 +125,7 @@
           </ul>
         </div>
       </div>
-    </footer>
+    </footer> -->
   </div>
 
 @endsection

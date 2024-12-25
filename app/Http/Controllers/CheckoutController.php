@@ -2,6 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CategoryPostModel;
+use App\Models\City;
+use App\Models\Feeship;
+use App\Models\Product;
+use App\Models\Province;
+use App\Models\Shipping;
+use App\Models\Order;
+use App\Models\OrderDetails;
+use App\Models\Silder;
+use App\Models\Wards;
 use DB;
 use Cart;
 use Session;
@@ -11,6 +21,94 @@ session_start();
 
 class CheckoutController extends Controller
 {
+    public function confirm_order(Request $request) {
+        $data = $request->all();
+        $shipping = new Shipping();
+        $shipping->shipping_name = $data['shipping_name'];
+        $shipping->shipping_email = $data['shipping_email'];
+        $shipping->shipping_phone = $data['shipping_phone'];
+        $shipping->shipping_address = $data['shipping_address'];
+        $shipping->shipping_notes = $data['shipping_notes'];
+        $shipping->shipping_method = $data['shipping_method'];
+        $shipping->save();
+        $shipping_id = $shipping->shipping_id;
+
+        $checkout_code = substr(md5(microtime()),rand(0,26),5);
+        $order = new Order();
+        $order->customer_id = Session::get('customer_id');
+        $order->shipping_id = $shipping_id;
+        $order->order_status = 1;
+        $order->order_code = $checkout_code;
+
+        date_default_timezone_set('Asia/Ho_Chi_Minh');
+        $order->created_at = now();
+        $order->save();
+
+
+        if (Session::get('cart')==true) {
+            foreach(Session::get('cart') as $key => $cart) {
+                $order_details = new OrderDetails;
+                $order_details->order_code = $checkout_code;
+                $order_details->product_id = $cart['product_id'];
+                $order_details->product_name = $cart['product_name'];
+                $order_details->product_price = $cart['product_price'];
+                $order_details->product_sales_quantity = $cart['product_qty'];
+                $order_details->product_coupon = $data['order_coupon'];
+                $order_details->product_feeship = $data['order_fee'];
+                $order_details->save();
+            }
+        }
+        Session::forget('coupon');
+        Session::forget('fee');
+        Session::forget('cart');
+
+    }
+    public function del_fee()  {
+        Session::forget('fee');
+        return redirect()->back();
+        }
+    public function calculate_fee(Request $request) {
+        $data = $request->all();
+        if ($data['matp']) {
+            $feeship = Feeship::where('fee_matp',$data['matp'])->where('fee_maqh',$data['maqh'])->where('fee_xaid',$data['xaid'])->get();
+            if ($feeship) {
+                $count_feeship = $feeship->count();
+                if ($count_feeship>0) {
+                    foreach($feeship as $key =>$fee) {
+                        Session::put('fee',$fee->fee_feeship);
+                        Session::save();
+                    }
+            } else {
+                Session::put('fee',10000);
+                Session::save();
+            }
+        }
+        }
+    }
+    public function select_delivery_home(Request $request){
+        $data = $request->all();
+        if ($data['action']) {
+           $output = '';
+           if ($data['action']=="city") {
+              $select_province = Province::where('matp',$data['ma_id'])->orderBy('maqh','ASC')->get();
+              $output.='<option value="">----Chọn quận huyện----</option>';
+              foreach($select_province as $key => $province)
+              {
+  
+                 $output.='<option value="'.$province->maqh.'">'.$province->name_quanhuyen.'</option>';
+              }
+              
+           } else {
+              $select_wards = Wards::where('maqh',$data['ma_id'])->orderBy('xaid','ASC')->get();
+              $output.='<option value="">----Chọn xã phường----</option>';
+              foreach($select_wards as $key=>$ward){
+                 $output.='<option value="'.$ward->xaid.'">'.$ward->name_xaphuong.'</option>';
+              }
+              
+           }
+           echo $output;
+        }
+    }
     
     public function AuthLogin() {
         $admin_id = Session::get("admin_id");
@@ -22,7 +120,8 @@ class CheckoutController extends Controller
         }
 
     public function login_checkout(Request $request) {
-
+        $category_post = CategoryPostModel::orderBy('cate_post_id','ASC')->get();
+        $slider = Silder::orderBy('slider_id','DESC')->where('slider_status','1')->take(4)->get();
         $meta_desc = 'Đăng nhập thanh toán';
         $meta_keywords = 'Đăng nhập thanh toán';
         $meta_title = "Đăng nhập thanh toán";
@@ -31,13 +130,23 @@ class CheckoutController extends Controller
         $cate_product = DB::table("tbl_category_product")->where('category_status','1')->orderBy("category_id","desc")->get();
         $brand_product = DB::table("tbl_brand")->where('brand_status','1')->orderBy("brand_id","desc")->get();
 
+        $min_price = Product::min('product_price');
+        $max_price = Product::max('product_price');
+        
+        $max_price_range = $max_price ;
+        
         return view("pages.checkout.login_checkout")
         ->with('cate_product', $cate_product)
         ->with('brand_product', $brand_product)
         ->with('meta_desc', $meta_desc)
         ->with('meta_keywords', $meta_keywords)
         ->with('meta_title', $meta_title)
-        ->with('url_canonical', $url_canonical);
+        ->with('url_canonical', $url_canonical)
+        ->with('slider', $slider)
+        ->with('category_post', $category_post)
+        ->with('min_price', $min_price)
+        ->with('max_price', $max_price)
+        ->with('max_price_range', $max_price_range);
     }
     public function add_customer(Request $request) { 
         $meta_desc = 'Đăng nhập thanh toán';
@@ -55,6 +164,7 @@ class CheckoutController extends Controller
 
         Session::put('customer_id',$customer_id);
         Session::put('customer_name',$request->customer_name);
+        
 
         return Redirect('/checkout')
         ->with('meta_desc', $meta_desc)
@@ -64,18 +174,30 @@ class CheckoutController extends Controller
     }
 
     public function checkout(Request $request) {
+        $category_post = CategoryPostModel::orderBy('cate_post_id','DESC')->get();
+        $slider = Silder::orderBy('slider_id','DESC')->where('slider_status','1')->take(4)->get();
         $cate_product = DB::table("tbl_category_product")->where('category_status','1')->orderBy("category_id","desc")->get();
         $brand_product = DB::table("tbl_brand")->where('brand_status','1')->orderBy("brand_id","desc")->get();
-
+        $city = City::orderBy('matp','ASC')->get();
         $meta_desc = 'Đăng nhập thanh toán';
         $meta_keywords = 'Đăng nhập thanh toán';
         $meta_title = "Đăng nhập thanh toán";
         $url_canonical = $request->url();
 
+        $min_price = Product::min('product_price');
+        $max_price = Product::max('product_price');
+        
+        $max_price_range = $max_price ;
+
         return view("pages.checkout.show_checkout")->with('cate_product',$cate_product)->with('brand_product',$brand_product)->with('meta_desc', $meta_desc)
         ->with('meta_keywords', $meta_keywords)
         ->with('meta_title', $meta_title)
-        ->with('url_canonical', $url_canonical);
+        ->with('url_canonical', $url_canonical)
+        ->with('city', $city)
+        ->with('slider', $slider)->with('category_post', $category_post)
+        ->with('min_price', $min_price)
+        ->with('max_price', $max_price)
+        ->with('max_price_range', $max_price_range);
     }
 
     public function save_checkout_customer(Request $request) {
