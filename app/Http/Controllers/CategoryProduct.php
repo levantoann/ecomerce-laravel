@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\ExcelExports;
 use App\Imports\ExcelImports;
 use App\Models\CategoryPostModel;
+use App\Models\Post;
 use App\Models\Product;
 use App\Models\Silder;
 use Auth;
@@ -27,8 +28,10 @@ class CategoryProduct extends Controller
       }
    public function add_category_product() {
       $this->AuthLogin();
-      $category_product = CategoryProductModel::where('category_parent', 0)->orderBy('category_id', 'DESC')->get();
-    return view("admin.add_category_product")->with('category_product',$category_product);
+      $category_product = CategoryProductModel::where('category_parent',0)->orderBy('category_id', 'DESC')->get();
+      return view("admin.add_category_product")
+      ->with('category_product',$category_product)
+      ;
    }
 
    public function all_category_product() {
@@ -195,14 +198,35 @@ class CategoryProduct extends Controller
 							<div class="tab-pane fade active in" id="tshirt" >
                      ';
 							foreach($product as $key => $val)
-                     $output.='<div class="col-sm-3">
+                     $output.='
+                  
+                     <input type="hidden" value="'.$val->product_id.'" class="cart_product_id_'.$val->product_id.'">
+
+											<input type="hidden" id="wishlist_productname'.$val->product_id.'" value="'.$val->
+                                 product_name.'" class="cart_product_name_'.$val->product_id.'">
+
+											<input type="hidden" value="'.$val->product_image.'" class="cart_product_image_'.
+                                 $val->product_id.'">
+
+											<input type="hidden" value="'.$val->product_quantity.'" class="cart_product_quantity_'.
+                                 $val->product_id.'">
+
+											<input type="hidden" id="wishlist_productprice'.$val->product_id.'" value="'.$val->product_price.'" class="cart_product_price_'.$val->product_id.'">
+											<input type="hidden" value="1" class="cart_product_qty_'.$val->product_id.'">
+
+                                 	<a id="wishlist_producturl'.$val->product_id.'" style="text-decoration: none;" href="'.url('/chi-tie-san-pham/'.$val->slug_product).'">
+											</a>
+
+                     <a href="'.url('/chi-tiet-san-pham/'.$val->slug_product).'"><div class="col-sm-3">
 									<div class="product-image-wrapper">
 										<div class="single-products">
 											<div class="productinfo text-center">
 												<img src="'.url('uploads/product/'.$val->product_image).'" alt="" />
 												<h2>'.number_format($val->product_price,0,',','.').' VND</h2>
 												<p>'.$val->product_name.'</p>
-												<a href="'.url('/chi-tiet-san-pham/'.$val->slug_product).'" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Xem chi tiết</a>
+                                    </a>
+
+												<button class="btn btn-default add-to-cart" id="'.$val->product_id.'" onclick="Addtocart(this.id);"><i class="fa fa-shopping-cart"></i>Thêm giỏ hàng</button>
 											</div>
 											
 										</div>

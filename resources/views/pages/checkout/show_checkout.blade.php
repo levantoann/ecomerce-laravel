@@ -56,7 +56,7 @@
 									</div>
 									<input type="button" value="Xác nhận đơn hàng" name="send_order" class="btn btn-primary btn-sm send_order">
 								</form>
-								<form role="form" action="{{route('insert-delivery')}}" method="post">
+								<form>
                                     @csrf
                                 <div class="form-group">
                                     <label for="">Chọn tỉnh thành phố</label>
@@ -82,7 +82,7 @@
                                 </div>
 								<input type="button" value="Tính phí vận chuyển" name="calculator_order" class="btn btn-primary btn-sm calculate_delivery">
                             </form>
-								{{Session::get('fee')}}
+								<!-- {{Session::get('fee')}} -->
 							</div>
 						</div>
 					</div>	
@@ -230,6 +230,13 @@
 			}
 		@endphp
 		</li>
+		<div class="col-md-12">
+			@php
+				$vnd_to_usd = $total_after/23083;
+			@endphp
+			<div id="paypal-button-container"></div>
+			<input type="hidden" id="vnd_to_usd" value="{{round($vnd_to_usd,2)}}">
+		</div>
 		
 	
 								

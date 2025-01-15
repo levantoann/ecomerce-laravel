@@ -10,8 +10,10 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\DeliveryController;
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MailController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProductController;
@@ -39,7 +41,10 @@ Route::post('/autocomplete-ajax',[HomeController::class, 'autocomplete_ajax']);
 Route::get('/lien-he',[ContactController::class, 'lien_he']); 
 Route::post("/update-info/{info_id}", [ContactController::class, 'update_info'])->name('update-info');
 Route::get("/information", [ContactController::class, 'information'])->name('information');
+Route::get("/list-nut", [ContactController::class, 'list_nut'])->name('list-nut');
+Route::get("/delete-icons", [ContactController::class, 'delete_icons'])->name('delete-icons');
 Route::post("/save-information", [ContactController::class, 'save_information'])->name('save-information');
+Route::post("/add-nut", [ContactController::class, 'add_nut'])->name('add-nut');
 
 // Danh mục sản phẩm trang chủ
 Route::get('/danh-muc-san-pham/{slug_category_product}',[CategoryProduct::class, 'show_category_home']); 
@@ -122,6 +127,7 @@ Route::get('/gio-hang', [CartController::class,'gio_hang'])->name('gio-hang');
 Route::get('/delete-to-cart/{rowId}', [CartController::class,'delete_to_cart'])->name('delete-to-cart');
 Route::get('/del-product/{session_id}', [CartController::class,'del_product'])->name('del-product');
 Route::get('/del-all-product', [CartController::class,'del_all_product'])->name('del-all-product');
+Route::get('/show-cart-manage', [CartController::class,'show_cart_manage'])->name('show-cart-manage');
 Route::post('/add-cart-ajax', [CartController::class,'add_cart_ajax'])->name('add-cart-ajax');
 
 // Coupon
@@ -157,10 +163,14 @@ Route::get('/view-order/{order_code}', [OrderController::class,'view_order'])->n
 Route::get('/print-order/{checkout_code}', [OrderController::class,'print_order'])->name('print-order');
 Route::post('/update-order-qty', [OrderController::class,'update_order_qty'])->name('update-order-qty');
 Route::post('/update-qty', [OrderController::class,'update_qty'])->name('update-qty');
+Route::get('/history', [OrderController::class,'history'])->name('history');
+Route::get('/view-history-order/{order_code}', [OrderController::class,'view_history_order'])->name('view-history-order');
 
 //Login google
 Route::get('/login-google', [AdminController::class,'login_google'])->name('login-google');
+Route::get('/login-customer-google', [AdminController::class,'login_customer_google'])->name('login-customer-google');
 Route::get('/google/callback', [AdminController::class,'callback_google'])->name('/google/callback');
+Route::get('/customer/google/callback', [AdminController::class,'callback_customer_google'])->name('/customer/google/callback');
 
 Route::get('/delivery', [DeliveryController::class,'delivery'])->name('delivery')->middleware('auth.roles');
 Route::post('/select-delivery', [DeliveryController::class,'select_delivery'])->name('select-delivery');
@@ -240,6 +250,7 @@ Route::post('/insert-gallery/{pro_id}',[GalleryController::class, 'insert_galler
 Route::post('/update-gallery-name',[GalleryController::class, 'update_gallery_name'])->name('update-gallery-name'); 
 Route::post('/delete-gallery',[GalleryController::class, 'delete_gallery'])->name('delete-gallery'); 
 Route::post('/update-gallery',[GalleryController::class, 'update_gallery'])->name('update-gallery'); 
+Route::post('/delete-document',[ProductController::class, 'delete_document'])->name('delete-document'); 
 
 // Video
 Route::get('/video',[VideoController::class, 'video'])->name('video'); 
@@ -251,3 +262,32 @@ Route::post('/delete-video',[VideoController::class, 'delete_video'])->name('del
 Route::get('/video-shop',[VideoController::class, 'video_shop'])->name('video-shop'); 
 Route::post('/update-video-image',[VideoController::class, 'update_video_image'])->name('update-video-image'); 
 Route::post('/watch-video',[VideoController::class, 'watch_video'])->name('watch-video'); 
+
+//Document
+Route::get('/upload-file',[DocumentController::class, 'upload_file'])->name('upload-file'); 
+Route::get('/upload-image',[DocumentController::class, 'upload_image'])->name('upload-image'); 
+Route::get('/upload-video',[DocumentController::class, 'upload_video'])->name('upload-video');  
+
+Route::get('/download-document',[DocumentController::class, 'download_document'])->name('download-document'); 
+Route::get('/create-document',[DocumentController::class, 'create_document'])->name('create-document');  
+Route::get('/list-document',[DocumentController::class, 'list_document'])->name('list-document'); 
+Route::get('/read-document',[DocumentController::class, 'read_document'])->name('read-document');  
+Route::get('/delete-document',[DocumentController::class, 'delete_document'])->name('delete-document');  
+
+// Folder
+Route::get('/create-folder',[DocumentController::class, 'create_folder'])->name('create-folder'); 
+Route::get('/rename-folder',[DocumentController::class, 'rename_folder'])->name('rename-folder');  
+Route::get('/delete-folder',[DocumentController::class, 'delete_folder'])->name('delete-folder'); 
+
+
+Route::get('/read-data',[DocumentController::class, 'read_data'])->name('read-data');  
+
+Route::get('/send-coupon/{coupon_time}/{coupon_condition}/{coupon_number}/{coupon_code}',[MailController::class, 'send_coupon'])->name('send-coupon');  
+Route::get('/send-coupon-default/{coupon_time}/{coupon_condition}/{coupon_number}/{coupon_code}',[MailController::class, 'send_coupon_default'])->name('send-coupon-default');  
+Route::get('/mail-example',[MailController::class, 'mail_example'])->name('mail-example');  
+Route::get('/send-mail',[MailController::class, 'send_mail'])->name('send-mail');  
+
+Route::get('/quen-mat-khau',[MailController::class, 'quen_mat_khau'])->name('quen-mat-khau');  
+Route::post('/recover-pass',[MailController::class, 'recover_pass'])->name('recover-pass');  
+Route::get('/update-new-pass',[MailController::class, 'update_new_pass'])->name('update-new-pass');  
+Route::post('/reset-new-pass',[MailController::class, 'reset_new_pass'])->name('reset-new-pass');  

@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gửi mail google</title>
+    <title>Gửi mã khuyến mãi cho khách vip</title>
 </head>
 <body>
-    <h1>Mai được gửi từ {{$name}}</h1>
-    <h4>Nội dung được gửi: {{$body}}</h4>
+    <h1>Gửi mã cho khách vip</h1>
 </body>
 </html>

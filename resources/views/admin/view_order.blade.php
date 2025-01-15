@@ -110,7 +110,8 @@
             <th>Mã giảm giá</th>
             <th>Số lượng</th>
             <th>Phí ship</th>
-            <th>Giá</th>
+            <th>Giá bán</th>
+            <th>Giá gốc</th>
             <th>Tổng tiền</th>
             <th style="width:30px;"></th>
           </tr>
@@ -152,6 +153,7 @@
             </td>
             <td>{{ number_format($details->product_feeship, 0, ',', '.') }}đ</td>
             <td>{{ number_format($details->product_price, 0, ',', '.') }}đ</td>
+            <td>{{ number_format($details->product->price_cost, 0, ',', '.') }}đ</td>
             <td>{{ number_format($subtotal, 0, ',', '.') }}đ</td>
           </tr>
       
@@ -175,6 +177,7 @@
             @endif
             Phí ship: {{ number_format($details->product_feeship, 0, ',', '.') }}đ <br>
             Thanh toán: {{ number_format($total_coupon, 0, ',', '.') }}đ
+            <input type="hidden" value="{{$total_coupon}}" class="total_coupon">
           </td>
           </tr>
           <tr>

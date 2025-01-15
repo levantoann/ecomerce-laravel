@@ -7,13 +7,13 @@
     </div>
     <div class="row w3-res-tb">
       <div class="col-sm-5 m-b-xs">
-        <select class="input-sm form-control w-sm inline v-middle">
+        <!-- <select class="input-sm form-control w-sm inline v-middle">
           <option value="0">Bulk action</option>
           <option value="1">Delete selected</option>
           <option value="2">Bulk edit</option>
           <option value="3">Export</option>
-        </select>
-        <button class="btn btn-sm btn-default">Apply</button>                
+        </select> -->
+        <!-- <button class="btn btn-sm btn-default">Apply</button>                 -->
       </div>
       <div class="col-sm-4">
       </div>
@@ -38,10 +38,15 @@
         <thead>
           <tr>
             <th>Tên mã giảm giá</th>
+            <th>Ngày bắt đầu</th>
+            <th>Ngày kết thúc</th>
             <th>Mã giảm giá</th>
             <th>Số lượng</th>
             <th>Điều kiện giảm giá</th>
             <th>Số giảm</th>
+            <th>Trạng thái</th>
+            <th>Hạn</th>
+            <th>Quản lý</th>
           </tr>
         </thead>
         <tbody>
@@ -49,6 +54,8 @@
           
           <tr>
             <td>{{$cou->coupon_name}}</td>
+            <td>{{$cou->coupon_date_start}}</td>
+            <td>{{$cou->coupon_date_end}}</td>
             <td>{{$cou->coupon_code}}</td>
             <td>{{$cou->coupon_time}}</td>
             <td><span class="text-ellipsis">
@@ -85,11 +92,57 @@
 
             </span></td>
 
+            <td><span class="text-ellipsis">
+              <?php 
+                if($cou->coupon_status==1){
+                  
+              ?>
+                    <span style="color:green">Đang kích hoạt</span>
+                 
+                 <?php 
+                 } else {
+                  ?>
+                  <span  style="color:red">Đã khóa</span>
+                  <?php
+                 }
+                 ?>
+
+            </span></td>
+            <td>
+                 <?php 
+                if($cou->coupon_date_end>$today){
+                  
+              ?>
+                    <span style="color:green">Còn hạn</span>
+                 
+                 <?php 
+                 } else {
+                  ?>
+                  <span  style="color:red">Đã hết hạn</span>
+                  <?php
+                 }
+                 ?>
+                 </td>
             <td>
             
                 <a href="{{URL::to('/delete-coupon/'.$cou->coupon_id)}}" onclick="return confirm('Bạn có chắc muốn xóa mã giảm giá này không?')" class="active styling-edit" ui-toggle-class="">
               <i class="fa fa-times text-danger text"></i>
                 </a>
+            </td>
+            <td>
+              
+              <p><a href="{{url('/send-coupon',[
+              'coupon_time'=>$cou->coupon_time,
+              'coupon_condition'=>$cou->coupon_condition,
+              'coupon_number'=>$cou->coupon_number,
+              'coupon_code'=>$cou->coupon_code,
+              ])}}" class="btn btn-success" style="margin: 5px 0">Gửi mã giảm giá cho khách vip</a></p>
+              <p><a href="{{url('/send-coupon-default',[
+              'coupon_time'=>$cou->coupon_time,
+              'coupon_condition'=>$cou->coupon_condition,
+              'coupon_number'=>$cou->coupon_number,
+              'coupon_code'=>$cou->coupon_code,
+              ])}}" class="btn btn-default">Gửi mã giảm giá cho khách</a></p>  
             </td>
           </tr>
           @endforeach

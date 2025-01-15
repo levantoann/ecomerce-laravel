@@ -40,8 +40,14 @@
                                 </div>
 
                                     <div class="form-group">
+                                        <label for="exampleInputEmail2">Giá gốc</label>
+                                        <input type="text" name="price_cost" class="form-control" id="exampleInputEmail2" placeholder="Giá sản phẩm">
+                                        <label class="error" for="price_cost"></label> <!-- Thêm label để chứa thông báo lỗi -->
+                                    </div>
+
+                                    <div class="form-group">
                                         <label for="exampleInputEmail2">Giá sản phẩm</label>
-                                        <input type="text" name="product_price" class="form-control" id="exampleInputEmail2" placeholder="Giá sản phẩm">
+                                        <input type="text" name="product_price" class="form-control price_format" id="exampleInputEmail2" placeholder="Giá sản phẩm">
                                         <label class="error" for="product_price"></label> <!-- Thêm label để chứa thông báo lỗi -->
                                     </div>
 
@@ -49,6 +55,11 @@
                                         <label for="product_image">Hình ảnh sản phẩm</label>
                                         <input type="file" name="product_image" class="form-control" id="product_image">
                                         <label class="error" for="product_image"></label> <!-- Thêm label để chứa thông báo lỗi -->
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="product_image">Tài liệu</label>
+                                        <input type="file" name="document" class="form-control" id="document">
                                     </div>
 
                                 <div class="form-group">

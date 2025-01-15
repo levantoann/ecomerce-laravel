@@ -33,6 +33,11 @@
                                 </div>
 
                                 <div class="form-group">
+                                    <label for="exampleInputEmail1">Giá gốc</label>
+                                    <input type="text"  name="price_cost" class="form-control price_format" id="exampleInputEmail1" placeholder="Giá sản phẩm" value="{{$pro->price_cost}}">
+                                </div>
+
+                                <div class="form-group">
                                     <label for="exampleInputEmail1">Giá sản phẩm</label>
                                     <input type="text" name="product_price" class="form-control" id="exampleInputEmail1" placeholder="Giá sản phẩm" value="{{$pro->product_price}}">
                                 </div>
@@ -41,6 +46,18 @@
                                     <input type="file" name="product_image" class="form-control">
                                     <img src="{{URL::to('uploads/product/'.$pro->product_image)}}" alt="" style="width:100px;height:100px">
                                 </div>
+
+                                <div class="form-group">
+                                        <label for="product_image">Tài liệu</label>
+                                        <input type="file" name="document" class="form-control" id="document">
+                                        @if ($pro->product_file)
+                                        <p><a href="{{asset('uploads/document/'.$pro->product_file)}}">{{$pro->product_file}} </a>
+                                        <button type="button" data-document_id="{{$pro->product_id}}" class="btn btn-sm btn-danger btn-delete-document"><i class="fa fa-times"></i></button>
+                                        </p>
+                                        @else
+                                        <p>Không có file</p>
+                                        @endif
+                                    </div>
                                 <div class="form-group">
                                     <label for="exampleInputPassword1">Mô tả sản phẩm</label>
                                     <textarea name="product_desc" id="ckeditor2" style="resize:none" rows="3" type="text" class="form-control" id="exampleInputPassword1">{{$pro->product_desc}}</textarea>

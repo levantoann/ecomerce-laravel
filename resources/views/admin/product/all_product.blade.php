@@ -44,9 +44,11 @@
             </th>
             <th>Tên sản phẩm</th>
             <th>Thư viện ảnh</th>
+            <th>Tài liệu</th>
             <th>Số lượng sản phẩm</th>
             <th>Slug</th>
-            <th>Giá</th>
+            <th>Giá bán</th>
+            <th>Giá gốc</th>
             <th>Hình ảnh sản phẩm</th>
             <th>Danh mục</th>
             <th>Tags sản phẩm</th>
@@ -62,9 +64,15 @@
             <td><label class="i-checks m-b-none"><input type="checkbox" name="post[]"><i></i></label></td>
             <td>{{$pro->product_name}}</td>
             <td><a href="{{('/add-gallery/'.$pro->product_id)}}">Thêm thư viện ảnh</a></td>
+            @if ($pro->product_file)
+            <td><a href="{{asset('uploads/document/'.$pro->product_file)}}">file</a></td>
+            @else
+            <td>Không có file</td>
+            @endif
             <td>{{$pro->product_quantity}}</td>
             <td>{{$pro->slug_product}}</td>
             <td>{{number_format($pro->product_price,0,',','.').' VNĐ'}}</td>
+            <td>{{number_format($pro->price_cost,0,',','.').' VNĐ'}}</td>
             <td><img src="uploads/product/{{$pro->product_image}}" alt="" style="width: 100px;height: 100px;"></td>
             <td>{{$pro->category_name}}</td>
             <td>{{$pro->product_tags}}</td>

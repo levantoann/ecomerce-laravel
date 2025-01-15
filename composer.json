@@ -9,12 +9,14 @@
         "barryvdh/laravel-dompdf": "^2.2",
         "bumbummen99/shoppingcart": "^4.2",
         "fruitcake/laravel-cors": "^2.0",
+        "google/apiclient": "^2.14",
         "guzzlehttp/guzzle": "^7.0.1",
         "laravel/framework": "^8.75",
         "laravel/sanctum": "^2.11",
         "laravel/socialite": "^5.16",
         "laravel/tinker": "^2.5",
-        "maatwebsite/excel": "^3.1"
+        "maatwebsite/excel": "^3.1",
+        "nao-pon/flysystem-google-drive": "~1.1"
     },
     "require-dev": {
         "facade/ignition": "^2.5",

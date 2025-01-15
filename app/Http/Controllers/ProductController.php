@@ -54,17 +54,22 @@ class ProductController extends Controller
           $data["slug_product"] = $request->slug_product;
           $data["product_tags"] = $request->product_tags;
           $data["product_price"] = $request->product_price;
+          $data["price_cost"] = $request->price_cost;
           $data["product_content"] = $request->product_content;
           $data["product_desc"] = $request->product_desc;
           $data["category_id"] = $request->product_cate;
           $data["brand_id"] = $request->product_brand;
           $data["product_status"] = $request->product_status;
           $data["product_image"] = $request->product_image;
+          $data["product_file"] = $request->product_file;
+         $data["product_views"] = $request->product_views ?? 0;
           $data["product_sold"] = $request->product_sold;
           $get_image = $request->file('product_image');
+          $get_document = $request->file('document');
 
           $path = 'uploads/product/';
           $path_gallery = 'uploads/gallery/';
+          $path_document = 'uploads/document/';
 
           if($get_image) { 
             $get_name_image = $get_image->getClientOriginalName();
@@ -73,6 +78,15 @@ class ProductController extends Controller
             $get_image->move($path,$new_image);
             File::copy($path.$new_image,$path_gallery.$new_image);
             $data['product_image'] = $new_image;
+           
+          }
+          if($get_document) { 
+           
+            $get_name_document = $get_document->getClientOriginalName();
+            $name_document = current(explode('.',$get_name_document));
+            $new_document = $name_document.rand(0,99).'.'.$get_document->getClientOriginalExtension();
+            $get_document->move($path_document,$new_document);
+            $data['product_file'] = $new_document;
            
           }
           $pro_id = DB::table("tbl_product")->insertGetId($data);
@@ -114,6 +128,7 @@ class ProductController extends Controller
         $this->AuthLogin();
           $data = array();
           $data["product_price"] = $request->product_price;
+          $data["price_cost"] = $request->price_cost;
           $data["slug_product"] = $request->slug_product;
           $data["product_quantity"] = $request->product_quantity;
           $data["product_content"] = $request->product_content;
@@ -135,7 +150,25 @@ class ProductController extends Controller
             return redirect('all-product');
           } 
 
+          $get_document = $request->file("document");
+          $path_document = 'uploads/document/';
+          if($get_document) { 
+                    
+            $get_name_document = $get_document->getClientOriginalName();
+            $name_document = current(explode('.',$get_name_document));
+            $new_document = $name_document.rand(0,99).'.'.$get_document->getClientOriginalExtension();
+            $get_document->move($path_document,$new_document);
+            $data['product_file'] = $new_document;
+            $product = Product::find('product_id',$product_id);
+          
+            unlink($path_document.$product->product_file);
+           
+            }
+          
+
           DB::table("tbl_product")->where('product_id',$product_id)->update($data);
+          
+
           Session::put('message','Cập nhật sản phẩm thành công');
           return Redirect::to('all-product');
        }
@@ -176,6 +209,10 @@ class ProductController extends Controller
             $cate_slug = $value->slug_category_product;
         }
 
+        $product = Product::where('product_id',$product_id)->first();
+        $product->product_views = $product->product_views + 1;
+        $product->save();
+
         $gallery = Gallery::where('product_id',$product_id)->get();
 
         $related_product = DB::table("tbl_product")
@@ -193,7 +230,8 @@ class ProductController extends Controller
         ->with('cate_slug',$cate_slug)->with('rating',$rating)
         ->with('min_price', $min_price)
         ->with('max_price', $max_price)
-        ->with('max_price_range', $max_price_range);
+        ->with('max_price_range', $max_price_range)
+        ->with('product ', $product  );
        }
 
        public function export_csv_product(){
@@ -360,5 +398,13 @@ class ProductController extends Controller
         'fileNames' => $fileNames
       );
       return view('admin.images.file_browser')->with($data);
+     }
+
+     public function delete_document(Request $request){
+      $product = Product::find($request->product_id);
+      $path_document = 'uploads/document/';
+      unlink($path_document.$product->product_file);
+      $product->product_file = '';
+      $product->save();
      }
 }

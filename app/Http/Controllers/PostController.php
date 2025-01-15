@@ -156,14 +156,18 @@ class PostController extends Controller
             $cate_id = $p->cate_post_id;
             $url_canonical = $request->url();
             $cate_post_id = $p->cate_post_id;
+            $post_id = $p->post_id;
         }
 
+        $post_by_id = Post::where('post_id',$post_id)->first();
+        $post_by_id->post_views = $post_by_id->post_views + 1;
+        $post_by_id->save();
         $related = Post::with('cate_post')->where('post_status',1)->where('cate_post_id',$cate_post_id)
         ->whereNotIn('post_slug',[$post_slug])->take(5)->get();
 
         return view("pages.baiviet.baiviet")->with(compact('cate_product',
         'brand_product','meta_desc','meta_keywords',
-        'url_canonical','meta_title','slider','category_post','post','related'));
+        'url_canonical','post_by_id','meta_title','slider','category_post','post','related'));
     }
 
     public function update_post(Request $request,$post_id) {

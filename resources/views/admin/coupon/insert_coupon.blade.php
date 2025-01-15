@@ -23,6 +23,16 @@
                                 </div>
 
                                 <div class="form-group">
+                                    <label for="exampleInputEmail1">Ngày bắt đầu giảm giá</label>
+                                    <input type="text" name="coupon_date_start" class="form-control" id="start_coupon" placeholder="Ngày bắt đầu giảm giá">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">Ngày kết thúc giảm giá</label>
+                                    <input type="text" name="coupon_date_end" class="form-control" id="end_coupon" placeholder="Ngày kết thúc giảm giá">
+                                </div>
+
+                                <div class="form-group">
                                     <label for="exampleInputEmail1">Mã giảm giá</label>
                                     <input type="text" name="coupon_code" class="form-control"  placeholder="Tên mã giảm giá">
                                 </div>

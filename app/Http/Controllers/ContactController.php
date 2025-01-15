@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CategoryPostModel;
 use App\Models\Contact;
+use App\Models\Icon;
 use App\Models\Product;
 use App\Models\Silder;
 use DB;
@@ -100,5 +101,44 @@ class ContactController extends Controller
         return redirect()->back()->with('message','Cập nhật thông tin website thành công');
     }
 
-   
+    public function list_nut() {
+      $icons = Icon::orderBy('id_icons','DESC')->get();
+
+      $output = '';
+      $output .= '<table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                            <th>Tên nút</th>
+                                            <th>Hình ảnh</th>
+                                            <th>Link</th>
+                                            <th>Quản lý</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>';
+                                        foreach($icons as $key => $ico){
+                                          $output.= '<tr>
+                                          <td>'.$ico->name.'</td>
+                                          <td><img height="32px" width="32px" src="'.url('uploads/icon/'.$ico->image).'" alt=""></td>
+                                          <td>'.$ico->link.'</td>
+                                          <td><button id="'.$ico->id_icons.'" onclick="delete_icons(this.id)" class="btn btn-danger">Xóa</button></td>
+                                          </tr>';
+                                        }
+    $output .='
+    </tbody>
+    </table>';
+    echo $output;
+    
+    
+                                      }
+    
+    public function delete_icons() {
+      $id = $_GET['id'];
+      $icons = Icon::find($id);
+      $icons->delete();
+    }
+
+    public function add_nut(Request $request) {
+      $data = $request->all();
+      dd($data);
+    }
 }

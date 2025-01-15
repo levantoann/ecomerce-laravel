@@ -6,6 +6,16 @@
 			<div class="row">
 				<div class="col-sm-4 col-sm-offset-1">
 					<div class="login-form"><!--login form-->
+					@if(session()->has('message'))
+                        <div class="alert alert-success">
+                            {!!session()->get('message')!!}
+                        </div>
+                        @elseif(session()->has('error'))
+                        <div class="alert alert-danger">
+                            {!!session()->get('error')!!}
+                        </div>
+                        @endif
+						
 						<h2>Đăng nhập tài khoản</h2>
 						<form action="{{URL::to('/login-customer')}}" method="POST">
                             {{csrf_field()}}
@@ -15,8 +25,27 @@
 								<input type="checkbox" class="checkbox"> 
 								Ghi nhớ đăng nhập
 							</span>
+							<p></p>
+							<span>
+								<a href="{{route('quen-mat-khau')}}">Quên mật khẩu</a>
+							</span>
 							<button type="submit" class="btn btn-default">Đăng nhập</button>
 						</form>
+
+						<style>
+							ul.list-login{
+								margin: 10px;
+								padding: 0;
+							}
+							ul.list-login li {	
+								display: inline;
+								margin: 5px;
+							}
+						</style>
+						<ul class="list-login">
+							<li><a href="{{url('login-customer-google')}}"><img width="10%" src="{{asset('uploads/logo/gg.png')}}" alt=""></a></li>
+							<li><a href="{{url('login-customer-facebook')}}"><img width="10%" src="{{asset('uploads/logo/facebook.png')}}" alt=""></a></li>
+						</ul>
 					</div><!--/login form-->
 				</div>
 				<div class="col-sm-1">
@@ -33,6 +62,8 @@
 							<input name="customer_phone" type="text" placeholder="Số điện thoại"/>
 							<button type="submit" class="btn btn-default">Đăng ký</button>
 						</form>
+
+						
 					</div><!--/sign up form-->
 				</div>
 			</div>

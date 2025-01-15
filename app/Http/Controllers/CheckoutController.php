@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\CategoryPostModel;
 use App\Models\City;
+use App\Models\Coupon;
+use App\Models\Customer;
 use App\Models\Feeship;
 use App\Models\Product;
 use App\Models\Province;
@@ -12,8 +14,10 @@ use App\Models\Order;
 use App\Models\OrderDetails;
 use App\Models\Silder;
 use App\Models\Wards;
+use Carbon\Carbon;
 use DB;
 use Cart;
+use Mail;
 use Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -23,6 +27,18 @@ class CheckoutController extends Controller
 {
     public function confirm_order(Request $request) {
         $data = $request->all();
+
+        if ($data['order_coupon']!='no') {
+            $coupon = Coupon::where('coupon_code',$data['order_coupon'])->first();
+        $coupon->coupon_used = $coupon->coupon_used.','.Session::get('customer_id');
+        $coupon->coupon_time = $coupon->coupon_time - 1;
+        $coupon_mail = $coupon->coupon_code;
+        $coupon->save();
+        } else {
+            $coupon_mail = 'Không có';
+        }
+         
+
         $shipping = new Shipping();
         $shipping->shipping_name = $data['shipping_name'];
         $shipping->shipping_email = $data['shipping_email'];
@@ -39,9 +55,13 @@ class CheckoutController extends Controller
         $order->shipping_id = $shipping_id;
         $order->order_status = 1;
         $order->order_code = $checkout_code;
-
+        
         date_default_timezone_set('Asia/Ho_Chi_Minh');
-        $order->created_at = now();
+        $today = Carbon::now('Asia/Ho_Chi_Minh')->format('Y-m-d H:i:s');
+
+        $order_date = Carbon::now('Asia/Ho_Chi_Minh')->format('Y-m-d');
+        $order->created_at = $today;
+        $order->order_date = $order_date;
         $order->save();
 
 
@@ -58,6 +78,52 @@ class CheckoutController extends Controller
                 $order_details->save();
             }
         }
+
+        $now = Carbon::now('Asia/Ho_Chi_Minh')->format('d-m-Y H:i:s');
+
+        $title_mail = "Đơn hàng xác nhận ngày".' '.$now;
+
+        $customer = Customer::find(Session::get('customer_id'));
+
+        $data['email'][] = $customer->customer_email;
+
+        if (Session::get('cart')==true) { 
+            foreach(Session::get('cart') as $key => $cart_email) {
+                $cart_array[] = array(
+                    'product_name' => $cart_email['product_name'],
+                    'product_price' => $cart_email['product_price'],
+                    'product_qty' => $cart_email['product_qty'],
+                );
+            }
+        }
+
+        if (Session::get('fee')==true) {
+            $fee = Session::get('fee');
+        } else {
+            $fee = '205000';
+        }
+        $shipping_array = array(
+            'fee' => $fee,
+            'customer_name' => $customer->customer_name,
+            'shipping_name' => $data['shipping_name'],
+            'shipping_email' => $data['shipping_email'],
+            'shipping_phone' => $data['shipping_phone'],
+            'shipping_address' => $data['shipping_address'],
+            'shipping_notes' => $data['shipping_notes'],
+            'shipping_method' => $data['shipping_method'],
+        );
+
+        $ordercode_mail = array(
+            'coupon_code' => $coupon_mail,
+            'order_code' => $checkout_code,
+
+        );
+
+        Mail::send('pages.mail.mail_order',['cart_array'=>$cart_array,'shipping_array'=>$shipping_array,'code'=>$ordercode_mail],function($message) use ($title_mail,$data) {
+            $message->to($data['email'])->subject($title_mail);
+            $message->from($data['email'],$title_mail);
+        });
+
         Session::forget('coupon');
         Session::forget('fee');
         Session::forget('cart');
@@ -225,7 +291,8 @@ class CheckoutController extends Controller
     }
 
     public function logout_checkout() {
-      Session::flush();
+      Session::forget('customer_id');
+      Session::forget('coupon');
       return Redirect('/login-checkout');
     }
 
@@ -233,12 +300,16 @@ class CheckoutController extends Controller
         $email = $request->email_account;
         $password =  md5($request->password_account);
         $result = DB::table('tbl_customers')->where('customer_email', $email)->where('customer_password', $password)->first();
+        if (Session::get('coupon')==true) {
+           Session:forget('coupon');
+        } 
         if($result) {
             Session::put('customer_id', $result->customer_id);
             return redirect('/checkout');
         } else {
             return redirect('/login-checkout');
         }
+        Session::save();
     }
 
     public function order_place(Request $request) {

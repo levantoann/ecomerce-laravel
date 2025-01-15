@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Coupon;
+use Carbon\Carbon;
 use Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -21,6 +22,9 @@ class CouponController extends Controller
         $coupon->coupon_time = $data['coupon_time'];
         $coupon->coupon_number = $data['coupon_number'];
         $coupon->coupon_condition = $data['coupon_condition'];
+        $coupon->coupon_date_start = $data['coupon_date_start'];
+        $coupon->coupon_date_end = $data['coupon_date_end'];
+        $coupon->coupon_status = $data['coupon_status'] ?? 1;
         $coupon->save();
 
         Session::put('message','Thêm mã giảm giá thành công');
@@ -28,8 +32,9 @@ class CouponController extends Controller
     }
 
     public function list_coupon() {
+        $today = Carbon::now('Asia/Ho_Chi_Minh')->format('d/m/Y');
         $coupon = Coupon::orderBy('coupon_id','DESC')->get();
-        return view('admin.coupon.list_coupon')->with(compact('coupon'));
+        return view('admin.coupon.list_coupon')->with(compact('coupon','today'));
     }
 
     public function delete_coupon($coupon_id) {

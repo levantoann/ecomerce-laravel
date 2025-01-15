@@ -123,7 +123,8 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                    },
                    success: function (data) {
                        alert('Cập nhật tình trạng đơn hàng thành công.');
-                       location.reload();
+                       console.log(data)
+                    //    location.reload();
                    },
                    error: function(xhr, status, error) {
                        alert('Có lỗi xảy ra trong quá trình cập nhật.');
@@ -133,6 +134,64 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
            }
        });
    });
+</script>
+
+<script type="text/javascript">
+    list_nut();
+    function delete_icons(id) {
+        $.ajax({
+            url: '{{ url('/delete-icons') }}',
+            method: 'GET',
+            data:{id:id},
+            success: function (data) {
+               list_nut();
+            },
+        });
+    }
+    function list_nut() {
+        $.ajax({
+            url: '{{ url('/list-nut') }}',
+            method: 'GET',
+            success: function (data) {
+               $('#list_nut').html(data);
+            },
+        });
+    }
+   $('.add-nut').click(function () {
+    console.log('Button clicked!'); // Kiểm tra sự kiện
+    var name = $('#name').val();
+    var link = $('#link').val();
+    var image = $('#image_nut')[0].files;
+
+    console.log({ name, link, image }); // Kiểm tra giá trị đầu vào
+
+    var form_data = new FormData();
+    form_data.append('name', name);
+    form_data.append('link', link);
+    form_data.append('image', image);
+
+    $.ajax({
+        url: '{{ url('/add-nut') }}',
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        contentType: false,
+        cache: false,
+        processData: false,
+        data: form_data,
+        success: function (data) {
+            console.log('Success:', data); // Kiểm tra phản hồi từ server
+            alert('Thêm nút thành công');
+            list_nut();
+        },
+        error: function (xhr) {
+            console.error('Error:', xhr.responseText); // Kiểm tra lỗi nếu có
+            alert('Có lỗi xảy ra!');
+        }
+    });
+});
+
 </script>
 
 
@@ -263,7 +322,14 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                 <li>
                     <a class="active" href="{{route('dashboard')}}">
                         <i class="fa fa-book"></i>
-                        <span>Dashboard</span>
+                        <span>Tổng quan</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a class="active" href="{{route('read-data')}}">
+                        <i class="fa fa-book"></i>
+                        <span>Google drive</span>
                     </a>
                 </li>
 
@@ -448,6 +514,8 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 <script src="{{asset('backend/js/scripts.js')}}"></script>
 <script src="{{asset('backend/js/jquery.slimscroll.js')}}"></script>
 <script src="{{asset('backend/js/jquery.nicescroll.js')}}"></script>
+<script src="{{asset('backend/js/simple.money.format.js')}}"></script>
+
 <!--[if lte IE 8]><script language="javascript" type="text/javascript" src="js/flot-chart/excanvas.min.js"></script><![endif]-->
 <script src="{{asset('backend/js/jquery.scrollTo.js')}}"></script>
 <script src="{{asset('backend/ckeditor/ckeditor.js')}}"></script>
@@ -456,6 +524,29 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.79/jquery.form-validator.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.14.1/jquery-ui.min.js" integrity="sha512-MSOo1aY+3pXCOCdGAYoBZ6YGI0aragoQsg1mKKBHXCYPIWxamwOE7Drh+N5CPgGI5SA9IEKJiPjdfqWFWmZtRA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+<script type="text/javascript">
+    $('.btn-delete-document').click(function(){
+        var product_id = $(this).data('document_id');
+        var _token = $('input[name="_token"]').val();
+        $.ajax({
+            url:"{{url('/delete-document')}}", // Đường dẫn API
+            method:"POST",
+            data:{product_id:product_id,_token:_token},
+            success:function(data){
+                alert('Xóa file thành công');
+                location.reload();
+            }
+        });
+       
+
+    })
+    </script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('.price_format').simpleMoneyFormat();
+
+    })
+    </script>
 <script>
     $(document).ready(function(){
         $('#category_order').sortable({
@@ -918,6 +1009,32 @@ $(document).ready(function() {
 	   
 	});
 	</script>
+
+    <!-- donut chart -->
+     <script type="text/javascript">
+        $(document).ready(function() {
+           var donut = new Morris.Donut({
+            
+            element: 'donut',
+            colors: [
+                '#a8328e',
+                '#61a1ce',
+                '#ce8f61',
+                '#f5b942',
+                '#4842f5',
+            ],
+            
+            data: [
+                { label: 'San pham', value: <?php echo $app_product ?>},
+                { label: 'Bai viet', value:  <?php echo $app_post ?> },
+                { label: 'Don hang', value:  <?php echo $app_order ?> },
+                { label: 'Video', value:  <?php echo $app_video ?> },
+                { label: 'Khách hàng', value:  <?php echo $app_customer ?> }
+            ]
+            
+            });
+        })
+     </script>
 <!-- calendar -->
 	<script type="text/javascript" src="js/monthly.js"></script>
 	<script type="text/javascript">
@@ -968,6 +1085,25 @@ $(document).ready(function() {
   } );
   </script>
 
+<script type="text/javascript">
+    $(document).ready(function() {
+        $( function() {
+    $("#start_coupon" ).datepicker({
+        prevText: "Tháng trước",
+        nextText: "Tháng sau",
+        dateFormat: "dd/mm/yy",
+        dayNamesMin: ["Thứ 2","Thứ 3","Thứ 4","Thứ 5","Thứ 6", "Thứ 7","Chủ nhật"],
+    });
+    $("#end_coupon").datepicker({
+        revText: "Tháng trước",
+        nextText: "Tháng sau",
+        dateFormat: "dd/mm/yy",
+        dayNamesMin: ["Thứ 2","Thứ 3","Thứ 4","Thứ 5","Thứ 6", "Thứ 7","Chủ nhật"],
+    });
+  } );
+    })
+
+    </script>
   <script type="text/javascript">
     $(document).ready(function() {
         chart30daysorder();

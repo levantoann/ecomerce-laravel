@@ -1,6 +1,11 @@
 @extends('welcome')
 @section('content')
 @foreach ($product_details as $key => $value )
+<input type="hidden" id="product_viewed_id" value="{{$value->product_id}}">
+<input type="hidden" id="viewed_productname{{$value->product_id}}" value="{{$value->product_name}}">
+<input type="hidden" id="viewed_producturl{{$value->product_id}}" value="{{url('/chi-tiet-san-pham/'.$value->slug_product)}}">
+<input type="hidden" id="viewed_productimage{{$value->product_id}}" value="{{asset('uploads/product/'.$value->product_image)}}">
+<input type="hidden" id="viewed_productprice{{$value->product_id}}" value="{{$value->product_price}}">
 
 <div class="product-details"><!--product-details-->
 						<nav aria-label="breadcrumb">

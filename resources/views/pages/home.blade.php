@@ -77,7 +77,47 @@
 								<div class="choose">
 									<ul class="nav nav-pills nav-justified">
 										<li><a href="#"><i class="fa fa-plus-square"></i><button class="button_wishlist" id="{{$product->product_id}}" onclick="add_wishlist(this.id);"><span>Yêu thích</span></button></a></li>
-										<li><a href="#"><i class="fa fa-plus-square"></i>So sánh</a></li>
+										<li><a style="cursor: pointer;" onclick="add_compare({{$product->product_id}})"><i class="fa fa-plus-square"></i>So sánh</a></li>
+										<div class="container">
+
+										<!-- Modal -->
+										<div class="modal fade" id="compare" role="dialog">
+											<div class="modal-dialog">
+											
+											<!-- Modal content-->
+											<div class="modal-content">
+												<div class="modal-header">
+												<button type="button" class="close" data-dismiss="modal">&times;</button>
+												<h4 class="modal-title"><span id="title-compare"></span></h4>
+												</div>
+												<div class="modal-body">
+												<!-- <div id="row_compare"></div> -->
+												 <table class="table table-hover" id="row_compare">
+													<thead>
+														<tr>
+															<th>Tên sản phẩm</th>
+															<th>Giá</th>
+															<th>Hình ảnh</th>
+															<th>Thông số kỹ thuật</th>
+															<th>Xem sản phẩm</th>
+															<th>Xóa</th>
+														</tr>
+													</thead>
+													<tbody>
+
+													</tbody>
+												 </table>
+												</div>
+												<div class="modal-footer">
+												<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+												</div>
+											</div>
+											
+											</div>
+										</div>
+										
+										</div>
+
 									</ul>
 								</div>
 							</div>

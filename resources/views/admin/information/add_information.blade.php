@@ -49,6 +49,48 @@
                         </div>
                     </section>
 
+                    <section class="panel">
+                        <header class="panel-heading">
+                            Cập nhật thông tin mạng xã hội
+                        </header>
+                        <div class="panel-body">
+                        <?php 
+                                $message = Session::get("message");
+                                if ($message) { 
+                                    echo '<span class="text-alert">'.$message.'</span>';
+                                    Session::put("message",  null);
+                                }
+                            ?>
+                            <div class="position-center">
+                                
+                            <form role="form" method="post" id="form-nut" enctype="multipart/form-data">
+                                    {{ csrf_field()}}
+                                    <div class="form-group">
+                                    <label for="exampleInputPassword1">Tên nút</label>
+                                    <input type="text" name="name" id="name" class="form-control">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="exampleInputPassword1">Link nút</label>
+                                    <input type="text" name="link" id="link" class="form-control">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="exampleInputPassword1">Hình ảnh nút</label>
+                                    <input name="info_image" type="file" class="form-control" id="image_nut"></input>
+                                   
+                                </div>
+                                
+                                <button type="button" name="add_nut" class="btn btn-info add-nut">Thêm nút</button>
+                            </form>
+                               
+                            </div>
+                            <div class="position-center">
+                                <div id="list_nut"></div>
+                            </div>
+                        </div>
+                    </section>
+
             </div>
             </div>
 @endsection

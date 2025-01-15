@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CategoryPostModel;
 use App\Models\CategoryProductModel;
+use App\Models\Icon;
 use App\Models\Product;
 use App\Models\Silder;
 use DB;
@@ -36,6 +37,9 @@ class HomeController extends Controller
         $meta_title = "Điện thoại xịn";
         $url_canonical = $request->url();
 
+        // get icon
+        $icons = Icon::orderBy('id_icons','DESC')->get();
+
         
 
         $min_price = Product::min('product_price');
@@ -48,17 +52,17 @@ class HomeController extends Controller
         $cate_product = DB::table("tbl_category_product")->where('category_status','1')->orderBy("category_parent","desc")->orderBy("category_order","desc")->get();
         $brand_product = DB::table("tbl_brand")->where('brand_status','1')->orderBy("brand_id","desc")->get();
 
-        $cate_pro_tabs = CategoryProductModel::where('category_parent','<>',0)->orderBy("category_id","desc")->get();
+        $cate_pro_tabs = CategoryProductModel::where('category_parent','<>',0)->orderBy("category_id","desc")->take(5)->get();
         // $all_product = DB::table("tbl_product")
         // ->join("tbl_category_product","tbl_category_product.category_id","=","tbl_product.category_id")
         // ->join("tbl_brand","tbl_brand.brand_id","=","tbl_product.brand_id")
         // ->orderby('product_id','desc')->get();
 
-        $all_product = DB::table("tbl_product")->where("product_status","1")->orderBy('product_id','desc')->limit(4)->get();
+        $all_product = DB::table("tbl_product")->where("product_status","1")->orderBy('product_id','desc')->limit(10)->get();
         // return view("pages.home")->with('category',$cate_product)->with('brand',$brand_product)->with('all_product',$all_product);
 
         return view("pages.home")->with(compact('cate_product','brand_product','all_product','meta_desc'
-        ,'meta_keywords','url_canonical','meta_title','slider','category_post','cate_pro_tabs','min_price','max_price','max_price_range'));
+        ,'meta_keywords','url_canonical','meta_title','slider','category_post','cate_pro_tabs','min_price','max_price','max_price_range','icons'));
     }
 
     public function search(Request $request) { 

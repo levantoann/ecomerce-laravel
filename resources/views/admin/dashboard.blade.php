@@ -73,5 +73,46 @@
     </table>
 </div>
 
-<div class="row"></div>
+<div class="row">
+    <div class="col-md-4 col-xs-12">
+     
+        <p class="title_thongke">Thống kê tổng sản phẩm bài viết đơn hàng</p>
+        <div id="donut"></div>
+    </div>
+        <div class="col-md-4 col-xs-12">
+        <style>
+        ol.list_views {
+            margin: 10px 0;
+            color: #fff;
+        }
+        ol.list_views a {
+            color: orange;
+            font-weight: 400;
+        }
+        </style>
+            <h3>Bài viết xem nhiều nhất</h3>
+            <ol class="list_views">
+            @foreach ($post_views as $key => $post_2)
+                <li>
+                    <a target="_blank" href="{{url('/bai-viet/'.$post_2->post_slug)}}">{{$post_2->post_title}}
+                         | <span style="color:black">{{$post_2->post_views}}</span>
+                    </a>
+                </li>
+                @endforeach
+            </ol>
+        </div>
+
+        <div class="col-md-4 col-xs-12">
+            <h3>Sản phẩm xem nhiều nhất</h3>
+            <ol class="list_views">
+            @foreach ($product_views as $key => $pro)
+                <li>
+                    <a target="_blank" href="{{url('/chi-tiet-san-pham/'.$pro->slug_product)}}">{{$pro->product_name}}
+                         | <span style="color:black">{{$pro->product_views}}</span>
+                    </a>
+                </li>
+                @endforeach
+            </ol>
+        </div>
+</div>
 @endsection

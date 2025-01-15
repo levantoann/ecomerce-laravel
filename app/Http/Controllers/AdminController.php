@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Post;
 use App\Models\Product;
+use App\Models\SocialCustomers;
 use App\Models\Statistic;
 use App\Models\Video;
 use App\Models\Visitor;
@@ -92,6 +93,7 @@ public function callback_google(){
         } else {
             $customer_new = new Social([
                 'provider_user_id' => $users->id,
+                'provider_user_email' => $users->email,
                 'provider' => strtoupper($provider)
             ]);
     
@@ -172,16 +174,16 @@ public function callback_google(){
 
        
 
-        // $product = Product::all()->count();
-        // $product_views = Product::orderBy('product_views','DESC')->take(20)->get();
-        // $post = Post::all()->count();
-        // $post_views = Post::orderBy('post_views','DESC')->take(20)->get();
-        $order = Order::all()->count();
-        $video = Video::all()->count();
-        $customer = Customer::all()->count();
+        $app_product = Product::all()->count();
+        $product_views = Product::orderBy('product_views','DESC')->take(20)->get();
+        $app_post = Post::all()->count();
+        $post_views = Post::orderBy('post_views','DESC')->take(20)->get();
+        $app_order = Order::all()->count();
+        $app_video = Video::all()->count();
+        $app_customer = Customer::all()->count();
         return view("admin.dashboard")->with(
             compact('visitors_total','visitor_count','visitor_of_last_month_count','visitor_of_this_month_count','visitor_of_year_count'
-            ,'order','video','customer'));
+            ,'app_order','app_video','app_customer','app_product','app_post','product_views','post_views'));
     }
 
     public function dashboard(Request $request) { 
@@ -279,4 +281,67 @@ public function callback_google(){
         }
         echo $data = json_encode($chart_data);
     }
+
+    public function login_customer_google() {
+        config(['services.google.com.redirect2' => env('GOOGLE_CLIENT_URL')]);
+        return Socialite::driver('google')->redirect();
+    }
+
+    
+public function callback_customer_google(){
+    config(['services.google.com.redirect2' => env('GOOGLE_CLIENT_URL')]);
+    $users = Socialite::driver('google')->stateless()->user(); 
+    // return $users->id;
+    $authUser = $this->findOrCreateCustomer($users,'google');
+    if($authUser) {
+        $account_name = Customer::where('customer_id',$authUser->user)->first();
+        Session::put('customer_id',$account_name->customer_id);
+        Session::put('customer_picture',$account_name->customer_picture);
+        Session::put('customer_name',$account_name->customer_name);
+    }elseif ($authUser) {
+        $account_name = Customer::where('customer_id',$authUser->user)->first();
+        Session::put('customer_id',$account_name->customer_id);
+        Session::put('customer_picture',$account_name->customer_picture);
+        Session::put('customer_name',$account_name->customer_name);
+    }
+    return redirect('/login-checkout')->with('message', 'Đăng nhập bằng tài khoản google <span style="color:red">'.$account_name->customer_email.'</span> thành công');
+  
+   
+}
+
+public function findOrCreateCustomer($users,$provider){
+    $authUser = SocialCustomers::where('provider_user_id', $users->id)->where('provider_user_email', $users->email)->first();
+    if($authUser){
+
+        return $authUser;
+    } else {
+        $customer_new = new SocialCustomers([
+            'provider_user_id' => $users->id,
+            'provider_user_email' => $users->email,
+            'provider' => strtoupper($provider)
+        ]);
+
+        $customer = Customer::where('customer_email',$users->email)->first();
+
+            if(!$customer){
+                $customer = Customer::create([
+                    'customer_name' => $users->name,
+                    'customer_email' => $users->email,
+                    'customer_picture' => $users->avatar,
+                    'customer_password' => '',
+                    'customer_token' => '',
+                    'customer_phone' => '',
+                ]);
+            }
+        $customer_new->customer()->associate($customer);
+        $customer_new->save();
+        return $customer_new;
+    }
+  
+   
+    
+
+
+}
+
 }

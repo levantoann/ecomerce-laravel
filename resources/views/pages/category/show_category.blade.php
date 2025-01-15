@@ -26,7 +26,7 @@
 								<form>
 									@csrf
 									<div id="slider-range"></div>
-									<input type="text" name="" id="amount" style="border:0;color:#f6931f;font-weight: bold;">
+									<input type="text" name="" id="amount" style="border:0;color:#f6931f;font-weight: bold;width: 100%;">
 									<input type="hidden" name="start_price" id="start_price">
 									<input type="hidden" name="end_price" id="end_price">
 									<br>
